@@ -12,6 +12,11 @@ function App() {
     const fetchAllShips = async () => {
       try {
         const appId = import.meta.env.VITE_WARGAMING_APP_ID
+        
+        if (!appId) {
+          throw new Error('【環境変数エラー】APIキー（VITE_WARGAMING_APP_ID）が読み込めていません。GitHub Secretsの設定を確認してください。')
+        }
+
         let allShips = []
         let pageNo = 1
         let hasMore = true
