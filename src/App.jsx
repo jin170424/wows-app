@@ -74,8 +74,20 @@ function App() {
     )
   }
 
-  if (error) return <div className="p-8 text-red-500 bg-[#11141a] min-h-screen text-center font-bold">エラー：{error}</div>
-
+  if (error) {
+  const debugKey = import.meta.env.VITE_WARGAMING_APP_ID;
+  return (
+    <div className="p-8 text-red-500 bg-[#11141a] min-h-screen text-center font-bold">
+      <p>エラー：{error}</p>
+      <div className="mt-4 p-4 bg-gray-900 text-gray-400 text-xs rounded inline-block text-left font-mono">
+        【デバッグ情報】<br />
+        ・キーの存在: {debugKey ? '◯ 存在します' : '❌ 空っぽです'}<br />
+        ・キーの文字数: {debugKey ? `${debugKey.length} 文字` : '0 文字'}<br />
+        ・キーの最初の3文字: {debugKey ? `"${debugKey.substring(0, 3)}"` : 'なし'}
+      </div>
+    </div>
+  )
+}
   return (
     <div className="p-6 bg-[#11141a] text-white min-h-screen font-sans antialiased">
       <h1 className="text-3xl font-extrabold text-center mb-8 tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400">
