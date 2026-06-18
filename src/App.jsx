@@ -214,9 +214,9 @@ function App() {
               </p>
               
               {/* 正解発表時の艦船説明文 */}
-              <p className="text-xs text-gray-400 text-left bg-[#11141a] p-3 rounded-lg mb-4 line-clamp-3 leading-relaxed">
+              <div className="text-xs text-gray-400 text-left bg-[#11141a] p-3 rounded-lg mb-4 max-h-28 overflow-y-auto leading-relaxed pr-2">
                 {currentQuestion.description || "この艦艇に関する詳細なデータが登録されています。"}
-              </p>
+              </div>
 
               <button
                 onClick={startNewQuiz}
