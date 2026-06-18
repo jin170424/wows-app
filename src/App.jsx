@@ -25,6 +25,18 @@ const TYPE_NAMES = {
   Submarine: '潜水艦'
 }
 
+// 📝 ★クイズ用のプールを作るフィルター関数（Vitestからテストできるように export を付与）
+export function filterQuizShips(shipArray) {
+  return shipArray.filter((ship) => {
+    // 名前に "[" や "]" が含まれるテスト艦を除外
+    const isTestShip = ship.name.includes('[') || ship.name.includes(']')
+    // ARPやALなどの特殊イベント・コラボ艦を除外
+    const isEventShip = ship.name.startsWith('ARP ') || ship.name.startsWith('AL ')
+    
+    return !isTestShip && !isEventShip
+  })
+}
+
 function App() {
   const [ships, setShips] = useState([])
   const [loading, setLoading] = useState(true)
@@ -97,15 +109,8 @@ function App() {
     return matchesType && matchesNation && matchesSearch
   })
 
-  // 📝 2. クイズ用のプール（テスト艦やイベント艦のノイズを除去）
-  const quizPool = ships.filter((ship) => {
-    // 名前に "[" や "]" が含まれるテスト艦を除外
-    const isTestShip = ship.name.includes('[') || ship.name.includes(']')
-    // ARPやALなどの特殊イベント・コラボ艦を除外
-    const isEventShip = ship.name.startsWith('ARP ') || ship.name.startsWith('AL ')
-    
-    return !isTestShip && !isEventShip
-  })
+  // 📝 2. ★クイズ用のプール（外に切り出した純粋関数を呼び出して利用）
+  const quizPool = filterQuizShips(ships)
 
   // 📝 3. 新しくクイズを1問生成する関数
   const startNewQuiz = () => {
@@ -141,7 +146,7 @@ function App() {
     const nextMode = !isQuizMode
     setIsQuizMode(nextMode)
     if (nextMode) {
-      startNewQuiz()
+      startNewQuiz
     }
   }
 
@@ -182,7 +187,7 @@ function App() {
         <div className="max-w-xl mx-auto bg-[#1c2029] border border-gray-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center">
           <h2 className="text-xl font-bold text-yellow-500 mb-4 tracking-wide">この船のシルエットは何だ？！</h2>
           
-          {/* シルエット画像エリア（逆光風グラデーション背景で視認性をUP） */}
+          {/* シルエット画像エリア（逆光風グラデーション背景） */}
           <div className="relative w-full h-48 bg-gradient-to-b from-slate-500 to-slate-800 rounded-xl flex items-center justify-center p-4 border border-gray-800 mb-6 overflow-hidden">
             <img 
               src={currentQuestion.images?.large || currentQuestion.images?.small} 
@@ -311,7 +316,7 @@ function App() {
                 key={ship.ship_id} 
                 className="relative w-60 h-80 bg-[#1c2029] border border-gray-800 rounded-xl overflow-hidden shadow-lg cursor-pointer group transition-all duration-300 hover:border-gray-700 hover:shadow-2xl"
               >
-                {/* 【前面】通常のカード表示（国名・艦種を日本語化） */}
+                {/* 【前面】通常のカード表示 */}
                 <div className="flex flex-col items-center justify-center h-full p-4 transition-all duration-350 ease-out group-hover:opacity-10 group-hover:scale-95">
                   {ship.price_gold > 0 && (
                     <span className="absolute top-3 right-3 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-600 text-[10px] text-black font-black rounded uppercase tracking-wider shadow">
