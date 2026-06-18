@@ -153,7 +153,7 @@ function App() {
           <h2 className="text-xl font-bold text-yellow-500 mb-4 tracking-wide">この船のシルエットは何だ？！</h2>
           
           {/* シルエット画像エリア */}
-          <div className="relative w-full h-48 bg-[#0e1118] rounded-xl flex items-center justify-center p-4 border border-gray-900 mb-6 overflow-hidden">
+          <div className="relative w-full h-48 bg-gradient-to-b from-slate-500 to-slate-800 rounded-xl flex items-center justify-center p-4 border border-gray-800 mb-6 overflow-hidden">
             <img 
               src={currentQuestion.images?.large || currentQuestion.images?.small} 
               alt="Quiz Silhouette" 
