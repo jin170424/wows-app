@@ -146,7 +146,7 @@ function App() {
     const nextMode = !isQuizMode
     setIsQuizMode(nextMode)
     if (nextMode) {
-      startNewQuiz
+      startNewQuiz()
     }
   }
 
