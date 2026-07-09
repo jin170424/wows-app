@@ -28,10 +28,15 @@ const TYPE_NAMES = {
 // 📝 ★クイズ用のプールを作るフィルター関数（Vitestからテストできるように export を付与）
 export function filterQuizShips(shipArray) {
   return shipArray.filter((ship) => {
-    // 名前に "[" や "]" が含まれるテスト艦を除外
-    const isTestShip = ship.name.includes('[') || ship.name.includes(']')
-    // ARPやALなどの特殊イベント・コラボ艦を除外
-    const isEventShip = ship.name.startsWith('ARP ') || ship.name.startsWith('AL ')
+    // 1. そもそも ship や ship.name が存在しない場合は安全のために除外（防衛策）
+    if (!ship || !ship.name) return false
+
+    // 2. 判定用に、名前を一度すべて小文字に変換したデータを作る（表記揺れ対策！）
+    const lowerName = ship.name.toLowerCase()
+
+    // 3. 小文字に統一したデータに対してチェックをかける
+    const isTestShip = lowerName.includes('[') || lowerName.includes(']')
+    const isEventShip = lowerName.startsWith('arp ') || lowerName.startsWith('al ')
     
     return !isTestShip && !isEventShip
   })
