@@ -1,16 +1,73 @@
-# React + Vite
+# 🚢 World of Warships (WoWS) 艦船図鑑 & シルエットクイズ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+World of Warships（WoWS）に登場する何百隻もの艦船データを一括取得し、滑らかなアニメーションを伴うリッチなUIで閲覧できる「モダンフロントエンド図鑑」と、プレイヤー向けの「シルエットクイズ（ミニゲーム）」を融合させたWebアプリケーションです。
 
-Currently, two official plugins are available:
+単なるデータ表示にとどまらず、**堅牢なテスト駆動設計（TDD）**、**自動CI/CDパイプライン**、**マルチホスティング環境**を構築し、モダンなWeb開発のベストプラクティスを凝縮して開発しました。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **GitHub Pages 公開URL**: `wows-app.vercel.app`
+- **Vercel 公開URL**: `https://wows-app.vercel.app/`
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🎮 主な機能
 
-## Expanding the ESLint configuration
+### 1. 📖 艦船図鑑（通常モード）
+* **全件一括同期**: Wargaming APIの1回あたり「100件取得制限」をループ処理で自力突破し、全件（数百隻）のデータを動的に全取得。
+* **マルチ・インタラクティブ・フィルター**: 国家（日本、アメリカ、ソ連など）、艦種（駆逐艦、巡洋艦、戦艦など）、フリーワードの3条件が完全連動する絞り込み。
+* **Tailwind v4 3Dシャッターアニメーション**: カードホバー時に下からシャッターが競り上がり、艦船の歴史的解説文やゲーム内価格がすっと表示される3Dホバー演出。
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. 🎮 シルエットクイズ（ミニゲームモード）
+* **シルエット出題**: Tailwindの `brightness-0` フィルターを用いて、艦船グラフィックを完全な影絵（シルエット）として難読化。
+* **自動4択生成**: 正解の1隻に対し、プールからランダムに抽出した重複のないハズレ3隻を自動で組み合わせた「4択問題」を毎回ランダムに動的生成。
+* **段階的インタラクション**: 回答クリック時にシルエットがカラーに復元され、正誤判定（緑・赤カラー）やスクロール対応の解説文を提示。
+* **徹底的なデータクレンジング**: 通常のAPIデータに含まれる「スーパーテスト艦（名前に `[` や `]` が含まれる開発中データ）」や「ARP」「AL」などのコラボイベント艦を完全に排除。
+
+---
+
+## 🛠️ 技術スタック
+
+### フロントエンド
+* **React** (Vite環境)
+* **Tailwind CSS v4** (最新のCSSベース設計による高速・軽量なUI)
+
+### テスト & 信頼性
+* **Vitest** (高速なテストランナーによるモダンなユニットテスト)
+
+### インフラ & CI/CD
+* **GitHub Actions** (テスト・ビルド・GitHub Pagesへの自動デプロイを統合したCIパイプライン)
+* **Vercel** (プレビュー確認および本番運用のための高速マルチホスティング)
+* **Wargaming Encyclopedia API** (外部データ通信)
+
+---
+
+## 💡 技術的なこだわりと工夫した点（就活アピールポイント）
+
+### 1. 堅牢性を極めた「自動単体テスト（TDD）」の導入
+開発中のテスト艦やイベント艦がクイズプールに混入してゲーム性を損なう問題を防ぐため、フィルターロジック（`filterQuizShips`）を純粋関数（Pure Function）としてコンポーネント外に切り出し、**Vitest** を用いた厳格なテストを構築しました。
+
+以下の**正常系・異常系・境界値・堅牢性**をすべて網羅する7つのテストケースを実装し、カバレッジ100%を達成しています。
+* **正常系 / 異常系**: 空配列時の安全な挙動、および通常艦・排除対象の完全な識別。
+* **境界値（ブラケット位置）**: `[Des Moines]`（先頭）、`Gearing [T]`（末尾）、`Mino[ta]ur`（途中）など、どの位置に特殊文字があっても確実に排除する境界値テスト。
+* **厳密な部分一致排除（偽陽性の防止）**: `Karp` などの通常艦（名前に `arp` が含まれる）を誤って排除しない、厳密な部分一致フィルタリング。
+* **データ欠損（null安全）**: APIから一部の `name` が `null` や `undefined` で送られてきても、アプリ全体をクラッシュさせずにスキップして実行を続ける高耐バグ設計。
+* **大文字・小文字の表記揺れ検知**: 運営側のデータ登録ミス（例: `[yamato]` のような小文字ブラケット、`arp kongo` などの小文字コラボ名）も、`.toLowerCase()` を用いたノーマライズ処理で100%排除。
+
+### 2. GitHub Actions による鉄壁のCI/CD自動化
+コードを `git push origin main` するだけで、以下のビルド＆デプロイワークフローが完全自動で動きます。
+1. **依存関係の解決** (`npm ci`)
+2. **自動テストの実行** (`npm run test` - **重要**)
+   * *※もしコード書き換えによって1つでもテストが失敗した場合、ワークフローはデプロイ手前で安全に強制ストップします。本番環境（本番サイト）の品質をシステム的に100%守る仕組みです。*
+3. **ビルド及び暗号化シークレットキーの注入** (`npm run build`)
+4. **GitHub Pages および Vercel への自動同時マルチデプロイ**
+
+### 3. 環境に応じたスマートな base パスの動的分岐
+GitHub Pages（サブディレクトリ型: `/wows-app/`）と Vercel（ルート直下ドメイン型: `/`）という、デプロイ先によるURL構造の違いに対し、コードを毎回手動で書き換えることなく解決しました。
+`vite.config.js` 内で GitHub Actions 環境下（`process.env.GITHUB_ACTIONS` が真のとき）でのみパスを動的に切り替えるロジックを実装し、**「1つのソースコードで、2つの異なるクラウドに同時に完璧にデプロイできるマルチホスティング」**をスマートに実現しました。
+
+---
+
+## 🏃‍♂️ ローカル開発環境の起動方法
+
+### 1. 依存関係のインストール
+```bash
+npm install
